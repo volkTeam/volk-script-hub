@@ -1,0 +1,23 @@
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+body { background-color: #0b0e14; color: #e2e8f0; }
+.navbar { background-color: #121824; padding: 15px 20px; border-bottom: 1px solid #1e293b; }
+.nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 22px; font-weight: 800; cursor: pointer; }
+.logo-bold { color: #fff; } .logo-blue { color: #38bdf8; }
+.nav-links { display: flex; gap: 15px; }
+.nav-link { background: none; border: none; color: #cbd5e1; cursor: pointer; font-weight: 600; }
+.icon-btn { background: #1a2332; color: #fff; border: 1px solid #2d3748; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+.dropdown-menu { display: none; position: absolute; right: 20px; top: 60px; background: #121824; border: 1px solid #2d3748; border-radius: 8px; padding: 10px; width: 180px; z-index: 1000; }
+.dropdown-menu.show { display: block; }
+.menu-btn { display: block; width: 100%; background: #1a2332; border: 1px solid #2d3748; color: #fff; padding: 8px; margin-bottom: 5px; cursor: pointer; text-align: left; }
+.main-wrapper { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
+.scripts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.script-card { background: #121824; border: 1px solid #1e293b; padding: 16px; border-radius: 12px; }
+.badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-right: 5px; }
+.badge-verified { background: #0284c7; color: #fff; }
+.badge-admin-tag { background: #b91c1c; color: #fff; }
+.btn-small { background: #1a2332; border: 1px solid #2d3748; color: #fff; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+.btn-primary-big { width: 100%; background: #2563eb; color: #fff; border: none; padding: 10px; border-radius: 8px; cursor: pointer; }
+.btn-secondary { background: #334155; color: #fff; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-top: 5px; cursor: pointer; }
+.form-card { background: #121824; border: 1px solid #1e293b; padding: 20px; border-radius: 12px; max-width: 500px; margin: 0 auto; }
+input, textarea { width: 100%; background: #1a2332; border: 1px solid #2d3748; padding: 10px; color: #fff; margin-bottom: 10px; border-radius: 6px; }

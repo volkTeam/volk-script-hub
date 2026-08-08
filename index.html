@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volk Script Hub</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="logo" onclick="showPage('mainPage')">
+        <span class="logo-bold">Volk</span><span class="logo-blue">ScriptHub</span>
+      </div>
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Поиск скриптов..." oninput="applyFilters()">
+      </div>
+      <nav class="nav-links">
+        <button class="nav-link" onclick="showPage('mainPage')">🏠 Главная</button>
+        <button id="adminNavBtn" class="nav-link admin-link" style="display:none;" onclick="showPage('adminPanelPage')">👑 Админ</button>
+        <button id="authNavBtn" class="nav-link auth-btn" onclick="showPage('authPage')">👤 Вход</button>
+      </nav>
+      <div class="settings-wrapper">
+        <button id="settingsBtn" class="icon-btn">⚙️</button>
+        <div id="dropdownMenu" class="dropdown-menu">
+          <h3>⚙️ Меню</h3>
+          <button class="menu-btn" onclick="goToMakeScript()">➕ Создать скрипт</button>
+          <button class="menu-btn star-btn" onclick="openAdminModal()">⭐ Админ Вход</button>
+          <button class="menu-btn" onclick="toggleMusic()">🎵 Музыка</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-wrapper">
+    <section id="mainPage" class="page-section">
+      <div class="hero-banner">
+        <h2>🐺 Volk Script Hub</h2>
+        <p>Лучшие проверенные скрипты Roblox.</p>
+        <span id="userWelcomeText" class="user-welcome"></span>
+      </div>
+      <div id="scriptsGrid" class="scripts-grid"></div>
+    </section>
+
+    <section id="makeScriptPage" class="page-section" style="display:none;">
+      <div class="form-card">
+        <h2>📝 Создание скрипта</h2>
+        <input type="text" id="scriptTitle" placeholder="Название">
+        <input type="text" id="scriptGame" placeholder="Название игры">
+        <textarea id="scriptCode" placeholder="Вставьте код (loadstring...)" rows="5"></textarea>
+        <button class="btn-primary-big" onclick="createNewScript()">Опубликовать</button>
+      </div>
+    </section>
+
+    <section id="authPage" class="page-section" style="display:none;">
+      <div class="form-card">
+        <h2>👤 Регистрация</h2>
+        <input type="email" id="userEmail" placeholder="Email адрес">
+        <input type="text" id="userName" placeholder="Имя (Ник)">
+        <input type="password" id="userPass" placeholder="Пароль">
+        <button class="btn-primary-big" onclick="registerUser()">Войти / Регистрация</button>
+        <button class="btn-secondary" onclick="logoutUser()">Выйти из профиля</button>
+      </div>
+    </section>
+
+    <section id="adminPanelPage" class="page-section" style="display:none;">
+      <div class="form-card">
+        <h2>👑 Админ-панель</h2>
+        <div id="reportsContainer"></div>
+      </div>
+    </section>
+  </div>
+
+  <audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3"></audio>
+  <script src="script.js"></script>
+</body>
+</html>

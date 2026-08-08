@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Volk Script Hub</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <header>
+    <div class="logo">🐺 Volk Hub</div>
+    <!-- Справа сверху кружок настроек -->
+    <button class="settings-btn" onclick="openModal('settingsModal')">⚙️</button>
+  </header>
+
+  <!-- Поиск прямо над скриптами -->
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Поиск скриптов или игр..." oninput="filterScripts()">
+  </div>
+
+  <main id="scriptsContainer" class="scripts-grid">
+    <p>Загрузка скриптов...</p>
+  </main>
+
+  <!-- Модальное окно: Настройки -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-body">
+      <h2>⚙️ Настройки</h2>
+      
+      <div class="form-group">
+        <button style="width:100%" onclick="toggleMusic()">🎵 Включить / Выключить музыку</button>
+      </div>
+      
+      <hr style="border-color:#30363d; margin: 15px 0;">
+
+      <!-- Авторизация / Регистрация -->
+      <div id="authBlock">
+        <h3>Регистрация / Вход</h3>
+        <div class="form-group">
+          <input type="email" id="userEmail" placeholder="Ваш Email">
+        </div>
+        <div class="form-group">
+          <input type="text" id="userName" placeholder="Имя пользователя">
+        </div>
+        <div class="form-group">
+          <input type="password" id="userPass" placeholder="Пароль">
+        </div>
+        <button class="primary" style="width:100%" onclick="registerUser()">Зарегистрироваться / Войти</button>
+      </div>
+
+      <div id="userInfo" style="display:none;">
+        <p>Вы вошли как: <b id="currentUserText"></b></p>
+        <p>Роль: <span id="currentRoleText"></span></p>
+        <button id="addScriptBtn" onclick="openModal('addScriptModal')" style="margin-top:10px; width:100%;">➕ Опубликовать скрипт</button>
+      </div>
+
+      <hr style="border-color:#30363d; margin: 15px 0;">
+
+      <!-- Стать админом -->
+      <div class="form-group">
+        <h3>🔑 Стать Админом</h3>
+        <input type="password" id="adminKeyInput" placeholder="Введите пароль админа">
+        <button class="danger" style="margin-top:8px; width:100%" onclick="becomeAdmin()">Подтвердить админку</button>
+      </div>
+
+      <button onclick="closeModal('settingsModal')" style="width:100%; margin-top:10px;">Закрыть</button>
+    </div>
+  </div>
+
+  <!-- Модальное окно: Добавить скрипт -->
+  <div id="addScriptModal" class="modal">
+    <div class="modal-body">
+      <h2>➕ Добавить скрипт</h2>
+      <div class="form-group">
+        <input type="text" id="scriptTitle" placeholder="Название скрипта">
+      </div>
+      <div class="form-group">
+        <input type="text" id="scriptGame" placeholder="Название игры (напр. Blox Fruits)">
+      </div>
+      <div class="form-group">
+        <textarea id="scriptCode" placeholder="Вставьте код скрипта (loadstring...)" style="width:100%; height:100px; background:#0d1117; color:#fff; border:1px solid #30363d; border-radius:6px; padding:8px;"></textarea>
+      </div>
+      <button class="primary" style="width:100%" onclick="publishScript()">Опубликовать</button>
+      <button onclick="closeModal('addScriptModal')" style="width:100%; margin-top:8px;">Отмена</button>
+    </div>
+  </div>
+
+  <!-- Музыка -->
+  <audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>

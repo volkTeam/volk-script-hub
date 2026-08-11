@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volk Hub - Ultimate Script Repository</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <!-- Header / Navigation -->
+    <header>
+        <a href="#" class="logo" onclick="showPage('home')">&lt;/&gt; Volk<span style="color:var(--text-main)">Hub</span></a>
+        
+        <div class="nav-search">
+            <input type="text" id="search-input" placeholder="Search scripts or games..." oninput="filterScripts()">
+        </div>
+
+        <div class="nav-buttons" id="nav-auth-container">
+            <button onclick="showPage('login')">Login</button>
+            <button class="btn-primary" onclick="showPage('signup')">Sign Up</button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <div class="container">
+
+        <!-- Home Page -->
+        <section id="home" class="page-section active">
+            <div class="hero-banner">
+                <h1>Explore & Share Scripts</h1>
+                <p>The best community-driven repository for game scripts and mods.</p>
+                <button class="btn-primary" onclick="checkAuthAndUpload()" id="upload-nav-btn">+ Publish Script</button>
+            </div>
+            
+            <h2 style="margin-top: 30px; font-size: 20px;">All Scripts</h2>
+            <div class="scripts-grid" id="scripts-container">
+                <!-- Dynamic scripts load here -->
+            </div>
+        </section>
+
+        <!-- Login Page -->
+        <section id="login" class="page-section">
+            <div class="auth-container">
+                <h2>Welcome Back</h2>
+                <p>Enter your account details to continue.</p>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="login-username" placeholder="Username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" placeholder="Password">
+                </div>
+                <button class="btn-primary" style="width: 100%;" onclick="handleLogin()">Log In</button>
+                <p style="text-align: center; margin-top: 15px; font-size: 13px;">
+                    Don't have an account? <a href="#" onclick="showPage('signup')" style="color: var(--accent-color);">Sign Up</a>
+                </p>
+            </div>
+        </section>
+
+        <!-- Sign Up Page -->
+        <section id="signup" class="page-section">
+            <div class="auth-container">
+                <h2>Create Account</h2>
+                <p>Join Volk Hub to share and manage your scripts.</p>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="signup-username" placeholder="Choose username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="signup-password" placeholder="Choose password">
+                </div>
+                <button class="btn-primary" style="width: 100%;" onclick="handleSignup()">Sign Up</button>
+                <p style="text-align: center; margin-top: 15px; font-size: 13px;">
+                    Already have an account? <a href="#" onclick="showPage('login')" style="color: var(--accent-color);">Log In</a>
+                </p>
+            </div>
+        </section>
+
+        <!-- Upload Script Page -->
+        <section id="upload" class="page-section">
+            <div class="auth-container" style="max-width: 600px;">
+                <h2>Publish New Script</h2>
+                <p>Fill in the details to add your script to the hub.</p>
+                <div class="form-group">
+                    <label>Script Title</label>
+                    <input type="text" id="script-title" placeholder="e.g. MM2 Godmode GUI">
+                </div>
+                <div class="form-group">
+                    <label>Game Name</label>
+                    <input type="text" id="script-game" placeholder="e.g. Murder Mystery 2">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="script-desc" rows="3" placeholder="Brief description of features..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Lua Code</label>
+                    <textarea id="script-code" rows="6" placeholder="loadstring(game:HttpGet(...))()"></textarea>
+                </div>
+                <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="script-key" style="width: auto;">
+                    <label for="script-key" style="margin-bottom: 0; cursor: pointer;">Requires Key System</label>
+                </div>
+                <button class="btn-primary" style="width: 100%;" onclick="handleUploadScript()">Publish Script</button>
+            </div>
+        </section>
+
+        <!-- Script Detail Modal / View Page -->
+        <section id="script-detail" class="page-section">
+            <div class="auth-container" style="max-width: 800px;">
+                <button onclick="showPage('home')" style="margin-bottom: 15px;">&larr; Back to Hub</button>
+                <h2 id="detail-title">Script Title</h2>
+                <p id="detail-game" style="color: var(--accent-color); font-weight: bold; margin-bottom: 10px;"></p>
+                <p id="detail-author" style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;"></p>
+                <p id="detail-desc" style="margin-bottom: 20px;"></p>
+                
+                <div class="form-group">
+                    <label>Source Code</label>
+                    <textarea id="detail-code" rows="6" readonly style="background: #000; color: #00ffcc;"></textarea>
+                </div>
+                <button class="btn-primary" onclick="copyScriptCode()">Copy Script</button>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

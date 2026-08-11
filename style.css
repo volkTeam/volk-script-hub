@@ -1,0 +1,232 @@
+// --- CONFIGURATION ---
+const SUPABASE_URL = 'ЗДЕСЬ_ТВОЙ_URL';
+const SUPABASE_ANON_KEY = 'ЗДЕСЬ_ТВОЙ_ANON_KEY';
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = JSON.parse(localStorage.getItem('volk_user')) || null;
+let allScripts = [];
+
+// Page switching logic
+function showPage(pageId) {
+    document.querySelectorAll('.page-section').forEach(section => {
+        section.classList.remove('active');
+        section.style.display = 'none';
+    });
+    
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) {
+        targetPage.classList.add('active');
+        targetPage.style.display = 'block';
+    }
+    window.scrollTo(0, 0);
+}
+
+// App Initialization
+document.addEventListener('DOMContentLoaded', () => {
+    updateAuthUI();
+    fetchScripts();
+    showPage('home');
+});
+
+function updateAuthUI() {
+    const navAuth = document.getElementById('nav-auth-container');
+    if (currentUser) {
+        navAuth.innerHTML = `
+            <span style="font-size: 14px; color: var(--accent-color);">👤 ${currentUser.username}</span>
+            <button onclick="handleLogout()">Log Out</button>
+        `;
+    } else {
+        navAuth.innerHTML = `
+            <button onclick="showPage('login')">Login</button>
+            <button class="btn-primary" onclick="showPage('signup')">Sign Up</button>
+        `;
+    }
+}
+
+// --- AUTHENTICATION ---
+async function handleSignup() {
+    const username = document.getElementById('signup-username').value.trim();
+    const password = document.getElementById('signup-password').value.trim();
+
+    if (!username || !password) {
+        alert("Please fill in all fields!");
+        return;
+    }
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('users')
+            .insert([{ username, password }])
+            .select();
+
+        if (error) throw error;
+
+        currentUser = data[0];
+        localStorage.setItem('volk_user', JSON.stringify(currentUser));
+        updateAuthUI();
+        alert("Account created successfully!");
+        showPage('home');
+    } catch (err) {
+        alert("Registration error: " + err.message);
+    }
+}
+
+async function handleLogin() {
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value.trim();
+
+    if (!username || !password) {
+        alert("Please fill in all fields!");
+        return;
+    }
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('users')
+            .select('*')
+            .eq('username', username)
+            .eq('password', password)
+            .single();
+
+        if (error || !data) {
+            alert("Invalid username or password!");
+            return;
+        }
+
+        currentUser = data;
+        localStorage.setItem('volk_user', JSON.stringify(currentUser));
+        updateAuthUI();
+        alert("Logged in successfully!");
+        showPage('home');
+    } catch (err) {
+        alert("Login error: " + err.message);
+    }
+}
+
+function handleLogout() {
+    currentUser = null;
+    localStorage.removeItem('volk_user');
+    updateAuthUI();
+    alert("Logged out!");
+    showPage('home');
+}
+
+function checkAuthAndUpload() {
+    if (!currentUser) {
+        alert("You must be logged in to publish scripts!");
+        showPage('login');
+        return;
+    }
+    showPage('upload');
+}
+
+// --- SCRIPTS MANAGEMENT ---
+async function fetchScripts() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('scripts')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        allScripts = data || [];
+        renderScripts(allScripts);
+    } catch (err) {
+        console.error("Error fetching scripts:", err.message);
+    }
+}
+
+function renderScripts(scripts) {
+    const container = document.getElementById('scripts-container');
+    if (!container) return;
+
+    if (scripts.length === 0) {
+        container.innerHTML = `<p style="color: var(--text-muted);">No scripts found.</p>`;
+        return;
+    }
+
+    container.innerHTML = scripts.map(script => `
+        <div class="script-card">
+            <div>
+                <h3>${escapeHtml(script.title)}</h3>
+                <div class="game-tag">🎮 ${escapeHtml(script.game)}</div>
+                <p>${escapeHtml(script.description || 'No description provided.')}</p>
+            </div>
+            <div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">By: ${escapeHtml(script.author_name)}</p>
+                <button class="btn-primary" style="width: 100%;" onclick="viewScript(${script.id})">View Script</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function handleUploadScript() {
+    const title = document.getElementById('script-title').value.trim();
+    const game = document.getElementById('script-game').value.trim();
+    const description = document.getElementById('script-desc').value.trim();
+    const script_code = document.getElementById('script-code').value.trim();
+    const has_key_system = document.getElementById('script-key').checked;
+
+    if (!title || !game || !script_code) {
+        alert("Please fill in Title, Game, and Script Code!");
+        return;
+    }
+
+    try {
+        const { error } = await supabaseClient
+            .from('scripts')
+            .insert([{
+                title,
+                game,
+                description,
+                script_code,
+                has_key_system,
+                author_name: currentUser.username,
+                author_verified: currentUser.is_verified || false
+            }]);
+
+        if (error) throw error;
+
+        alert("Script published successfully!");
+        fetchScripts();
+        showPage('home');
+    } catch (err) {
+        alert("Upload error: " + err.message);
+    }
+}
+
+function viewScript(id) {
+    const script = allScripts.find(s => s.id === id);
+    if (!script) return;
+
+    document.getElementById('detail-title').innerText = script.title;
+    document.getElementById('detail-game').innerText = "Game: " + script.game;
+    document.getElementById('detail-author').innerText = "Author: " + script.author_name;
+    document.getElementById('detail-desc').innerText = script.description || '';
+    document.getElementById('detail-code').value = script.script_code;
+
+    showPage('script-detail');
+}
+
+function copyScriptCode() {
+    const codeArea = document.getElementById('detail-code');
+    codeArea.select();
+    navigator.clipboard.writeText(codeArea.value);
+    alert("Script code copied to clipboard!");
+}
+
+function filterScripts() {
+    const query = document.getElementById('search-input').value.toLowerCase();
+    const filtered = allScripts.filter(s => 
+        s.title.toLowerCase().includes(query) || 
+        s.game.toLowerCase().includes(query) ||
+        s.author_name.toLowerCase().includes(query)
+    );
+    renderScripts(filtered);
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}

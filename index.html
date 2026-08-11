@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Volk Hub — Roblox Scripts</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- Навигация -->
+  <header class="navbar">
+    <div class="nav-left">
+      <div class="logo" onclick="showPage('home')">
+        <i class="fa-solid fa-code"></i>
+        <span>Volk<strong>Hub</strong></span>
+      </div>
+    </div>
+    <div class="nav-right">
+      <div id="authButtons" class="auth-btns">
+        <button class="btn btn-outline" onclick="showPage('login')">Login</button>
+        <button class="btn btn-cyan" onclick="showPage('signup')">Sign Up</button>
+      </div>
+      <div id="userProfile" class="user-profile" style="display: none;">
+        <img id="userNavAvatar" src="" class="nav-avatar" alt="Avatar">
+        <span id="userEmailText" style="color: var(--cyan-primary); font-weight: 650;"></span>
+        <button class="btn btn-outline btn-sm" onclick="showPage('profile')">Profile</button>
+        <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
+      </div>
+      <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </header>
+
+  <!-- Боковое меню -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo"><span>Volk<strong>Hub</strong></span></div>
+      <button class="close-sidebar" onclick="toggleSidebar()">&times;</button>
+    </div>
+    <nav class="sidebar-menu">
+      <a href="#" onclick="showPage('home'); toggleSidebar();" class="active"><i class="fa-solid fa-house"></i> Home</a>
+      <a href="#" onclick="showPage('upload'); toggleSidebar();"><i class="fa-solid fa-upload"></i> Upload</a>
+      <a href="#" onclick="showPage('rules'); toggleSidebar();"><i class="fa-solid fa-shield-halved"></i> Rules</a>
+      <a href="#" id="adminSidebarLink" style="display: none;" onclick="showPage('admin'); toggleSidebar();"><i class="fa-solid fa-user-shield"></i> Admin Panel</a>
+    </nav>
+  </aside>
+
+  <!-- Основной контейнер -->
+  <main class="container">
+
+    <!-- Главная (Home) -->
+    <section id="pageHome" class="page-section">
+      <div class="online-stats">
+        <div><span class="dot green"></span> <strong id="regOnline">0</strong> Registered users online</div>
+        <div><span class="dot blue"></span> <strong id="guestOnline">0</strong> Guests online</div>
+      </div>
+
+      <div class="hero-section">
+        <h1 class="hero-title">Volk<span>Hub</span></h1>
+        <p class="hero-subtitle">Search the best Lua scripts available in the community uploaded by users!</p>
+        
+        <div class="search-bar-container">
+          <div class="search-input-wrap">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="searchInput" placeholder='Try "bloxburg"' oninput="filterScripts()" />
+          </div>
+          <button class="btn btn-cyan btn-search" onclick="filterScripts()">Search</button>
+        </div>
+
+        <div class="strict-search-toggle">
+          <label class="switch">
+            <input type="checkbox" id="strictSearch" onchange="filterScripts()">
+            <span class="slider round"></span>
+          </label>
+          <span>Strict search (match exact input)</span>
+        </div>
+      </div>
+
+      <div class="script-grid" id="scriptGrid">
+        <div class="loading">Loading scripts...</div>
+      </div>
+    </section>
+
+    <!-- Детали Скрипта -->
+    <section id="pageDetail" class="page-section" style="display: none;">
+      <button class="btn btn-outline" onclick="showPage('home')" style="margin-bottom: 1rem;"><i class="fa-solid fa-arrow-left"></i> Back</button>
+      <div id="scriptDetailContent"></div>
+    </section>
+
+    <!-- Профиль Юзера -->
+    <section id="pageProfile" class="page-section" style="display: none;">
+      <div class="auth-card profile-card">
+        <h2>My Profile</h2>
+        <p class="auth-desc">Customize your profile settings and avatar.</p>
+        <div class="profile-preview-box">
+          <img id="profilePreviewImg" src="" alt="Avatar" class="big-avatar">
+        </div>
+        <div class="form-group">
+          <label>Avatar URL (Image Link)</label>
+          <input type="text" id="profileAvatarInput" placeholder="https://example.com/avatar.png" />
+        </div>
+        <button class="btn btn-cyan btn-full" onclick="updateProfileAvatar()">Save Avatar</button>
+      </div>
+    </section>
+
+    <!-- Админ Панель -->
+    <section id="pageAdmin" class="page-section" style="display: none;">
+      <div class="rules-card">
+        <h2>Admin Management Panel</h2>
+        <p class="auth-desc">Manage verified badges, administrators, and banned/bad scripts.</p>
+        
+        <h3>1. Assign/Remove Verified Badge</h3>
+        <div class="form-group" style="margin-top:10px;">
+          <input type="text" id="badgeUsernameInput" placeholder="Enter exact username..." />
+          <div style="display:flex; gap:10px; margin-top:8px;">
+            <button class="btn btn-cyan" onclick="setUserBadge(true)">Give Verified</button>
+            <button class="btn btn-danger" onclick="setUserBadge(false)">Remove Verified</button>
+          </div>
+        </div>
+
+        <h3>2. Assign Administrator Role</h3>
+        <div class="form-group" style="margin-top:10px;">
+          <input type="text" id="adminUsernameInput" placeholder="Enter username to make admin..." />
+          <button class="btn btn-cyan" style="margin-top:8px;" onclick="promoteToAdmin()">Make Admin</button>
+        </div>
+
+        <h3>3. Manage Scripts (Ban / Delete)</h3>
+        <div id="adminScriptsList" style="margin-top: 15px;"></div>
+      </div>
+    </section>
+
+    <!-- Вход (Login) -->
+    <section id="pageLogin" class="page-section" style="display: none;">
+      <div class="auth-card">
+        <h2>Login</h2>
+        <p class="auth-desc">Enter your username and password to log in.</p>
+        <div class="form-group">
+          <label>Username *</label>
+          <input type="text" id="loginUsername" placeholder="Enter your nickname" />
+        </div>
+        <div class="form-group">
+          <label>Password *</label>
+          <input type="password" id="loginPassword" placeholder="Enter password" />
+        </div>
+        <button class="btn btn-cyan btn-full" onclick="customLogin()">Login</button>
+      </div>
+    </section>
+
+    <!-- Регистрация (Sign Up) -->
+    <section id="pageSignup" class="page-section" style="display: none;">
+      <div class="auth-card">
+        <h2>Sign Up</h2>
+        <p class="auth-desc">Choose a unique username and password for Volk Hub.</p>
+        <div class="form-group">
+          <label>Username *</label>
+          <input type="text" id="signupUsername" placeholder="e.g. VolkPlayer" />
+        </div>
+        <div class="form-group">
+          <label>Password *</label>
+          <input type="password" id="signupPassword" placeholder="Create password" />
+        </div>
+        <button class="btn btn-cyan btn-full" onclick="customSignUp()">Create Account</button>
+      </div>
+    </section>
+
+    <!-- Загрузка скрипта (Upload) -->
+    <section id="pageUpload" class="page-section" style="display: none;">
+      <div class="auth-card upload-card">
+        <h2>Upload Script</h2>
+        <p class="auth-desc">Share your Lua script with the community.</p>
+        <div class="form-group">
+          <label>Script Title *</label>
+          <input type="text" id="scriptTitle" placeholder="e.g. Blox Fruits Auto Farm" />
+        </div>
+        <div class="form-group">
+          <label>Game Name *</label>
+          <input type="text" id="scriptGame" placeholder="e.g. Blox Fruits" />
+        </div>
+        <div class="form-group">
+          <label>Script Image / Thumbnail URL</label>
+          <input type="text" id="scriptImage" placeholder="https://imgur.com/image.png (Optional)" />
+        </div>
+        <div class="form-group">
+          <label>Description & Features *</label>
+          <textarea id="scriptDesc" rows="4" placeholder="List script features..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Script Code (Lua) *</label>
+          <textarea id="scriptCode" rows="6" placeholder="loadstring(game:HttpGet(...))()"></textarea>
+        </div>
+        <div class="form-group checkbox-group">
+          <label><input type="checkbox" id="hasKeySystem" /> Has Key System</label>
+        </div>
+        <button class="btn btn-cyan btn-full" onclick="publishScript()">Upload Script</button>
+      </div>
+    </section>
+
+    <!-- Правила (Rules) -->
+    <section id="pageRules" class="page-section" style="display: none;">
+      <div class="rules-card">
+        <h2>Volk Hub Rules & Safety</h2>
+        <p class="auth-desc">Our platform is fully moderated to ensure a secure environment for all users.</p>
+        
+        <h3>1. Content Safety & Moderation</h3>
+        <p>Volk Hub is fully moderated by administration. All scripts, descriptions, and comments are checked. We strictly prohibit malware, stealers, viruses, or malicious links. The platform remains completely safe and compliant.</p>
+        
+        <h3>2. Community Guidelines</h3>
+        <p>Be respectful in comments. No spam, fake content, or external scam links. Abuse of likes/dislikes is strictly prohibited.</p>
+        
+        <h3>3. Ban Evasion</h3>
+        <p>Creating alternative accounts to bypass bans or punishments is forbidden. Secondary accounts will also be banned.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

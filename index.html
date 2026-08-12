@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volk Hub - Script Repository</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Навигация -->
+    <header class="navbar">
+        <div class="nav-left">
+            <a href="#" class="logo" onclick="switchTab('home')">
+                <i class="fa-solid fa-cube"></i> Volk<span>Hub</span>
+            </a>
+        </div>
+        <div class="nav-right">
+            <!-- Кнопка админ-панели -->
+            <button id="adminPanelBtn" class="icon-btn admin-only-btn" style="display:none;" onclick="openAdminModal()" title="Панель Модерации">
+                <i class="fa-solid fa-shield-halved"></i>
+            </button>
+
+            <!-- Статус пользователя -->
+            <div id="userBadge" class="user-status-tag">Гость</div>
+
+            <button class="auth-btn login" id="authActionBtn" onclick="openAuthModal()">Войти</button>
+            
+            <!-- Меню в углу -->
+            <button id="menuBtn" class="icon-btn menu-bolt-btn" title="Меню">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Выдвижное меню (Sidebar) -->
+    <div id="sidebar" class="sidebar sidebar-right">
+        <div class="sidebar-header">
+            <h3><i class="fa-solid fa-sliders"></i> Навигация</h3>
+            <button id="closeMenuBtn" class="icon-btn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <ul class="sidebar-links">
+            <li><a href="#" onclick="switchTab('home'); closeMenu();"><i class="fa-solid fa-house"></i> Главная</a></li>
+            <li><a href="#" onclick="switchTab('upload'); closeMenu();"><i class="fa-solid fa-cloud-arrow-up"></i> Опубликовать</a></li>
+            <li><a href="#" onclick="switchTab('trending'); closeMenu();"><i class="fa-solid fa-fire"></i> В тренде</a></li>
+            <li><a href="#" onclick="switchTab('guides'); closeMenu();"><i class="fa-solid fa-graduation-cap"></i> Гайды</a></li>
+            <li><a href="#" onclick="switchTab('rules'); closeMenu();"><i class="fa-solid fa-shield-halved"></i> Правила</a></li>
+        </ul>
+    </div>
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Основной контент -->
+    <main class="container">
+
+        <!-- Вкладка HOME -->
+        <section id="home-tab" class="tab-content active">
+            <div class="stats-bar">
+                <span class="online-dot reg"></span> <span id="regCount">244</span> Зарегистрировано
+                <span class="online-dot guest"></span> <span id="guestCount">7857</span> Гостей онлайн
+            </div>
+
+            <div class="hero">
+                <h1 class="gradient-text">Volk Hub</h1>
+                <p>Лучший каталог Lua скриптов для Roblox от сообщества Volk Team!</p>
+                
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Поиск: 'adopt me', 'blox fruits'...">
+                    <button class="search-submit" onclick="searchScripts()">Искать</button>
+                </div>
+            </div>
+
+            <div class="info-cards">
+                <div class="info-card">
+                    <i class="fa-solid fa-users"></i>
+                    <h3>Активное комьюнити</h3>
+                    <p>Делитесь скриптами и находите лучшие читы бесплатно!</p>
+                </div>
+                <div class="info-card">
+                    <i class="fa-solid fa-shield-cat"></i>
+                    <h3>Безопасность</h3>
+                    <p>Модерация проверяет публикацию скриптов и банит спамеров.</p>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <h2><i class="fa-solid fa-code"></i> Свежие Скрипты</h2>
+            </div>
+            
+            <div id="scriptsContainer" class="scripts-grid"></div>
+        </section>
+
+        <!-- Вкладка UPLOAD -->
+        <section id="upload-tab" class="tab-content">
+            <div class="form-container">
+                <h2>Публикация Скрипта</h2>
+                <div id="uploadRestrictionNotice" class="notice-box" style="display:none;"></div>
+                <form id="uploadForm" onsubmit="handleUpload(event)">
+                    <div class="form-group">
+                        <label>Название Скрипта</label>
+                        <input type="text" id="scriptTitle" required placeholder="Например: Blox Fruits Auto Farm">
+                    </div>
+                    <div class="form-group">
+                        <label>Название Игры</label>
+                        <input type="text" id="scriptGame" required placeholder="Например: Blox Fruits">
+                    </div>
+                    <div class="form-group">
+                        <label>Описание</label>
+                        <textarea id="scriptDesc" rows="3" placeholder="Опишите функции скрипта..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Lua Код</label>
+                        <textarea id="scriptCode" rows="6" required placeholder="loadstring(game:HttpGet(...))()"></textarea>
+                    </div>
+                    <button type="submit" id="submitScriptBtn" class="submit-btn">Опубликовать</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Вкладка TRENDING -->
+        <section id="trending-tab" class="tab-content">
+            <h2>Популярные Скрипты</h2>
+            <p>Скрипты с наибольшим количеством лайков.</p>
+            <div id="trendingContainer" class="scripts-grid"></div>
+        </section>
+
+        <!-- Вкладка GUIDES -->
+        <section id="guides-tab" class="tab-content">
+            <div class="doc-header">
+                <h2>Гайды и Инструкции</h2>
+            </div>
+            <div class="doc-card">
+                <h3><span>1</span> Что такое инжектор / эксплойт?</h3>
+                <p>Программа для выполнения Lua скриптов внутри клиента Roblox (Delta, Fluxus, Codex, Cryptic).</p>
+            </div>
+            <div class="doc-card">
+                <h3><span>2</span> Как запустить скрипт?</h3>
+                <p>Скопируйте код нажатием кнопки "Copy Script", вставьте его в поле эксплойта и нажмите Execute.</p>
+            </div>
+        </section>
+
+        <!-- Вкладка RULES -->
+        <section id="rules-tab" class="tab-content">
+            <div class="doc-header">
+                <h2>Правила Сервиса</h2>
+            </div>
+            <div class="rule-box">
+                <h3>Запреты и Бан:</h3>
+                <ul>
+                    <li>Запрещён спам, публикация фейковых или скам скриптов.</li>
+                    <li>Запрещена реклама сторонних вредоносных ресурсов.</li>
+                    <li>Модераторы (MODER) и Разработчики (DEVELOPER) могут забанить аккаунт навсегда за нарушения.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Вкладка Деталей Скрипта -->
+        <section id="detail-tab" class="tab-content">
+            <button class="back-btn" onclick="switchTab('home')"><i class="fa-solid fa-arrow-left"></i> Назад</button>
+            <div id="scriptDetailContent"></div>
+        </section>
+
+    </main>
+
+    <!-- Модальное окно Входа -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeAuthModal()">&times;</span>
+            <h2 id="modalTitle">Вход в Аккаунт</h2>
+            <div class="form-group">
+                <label>Никнейм</label>
+                <input type="text" id="authUsername" placeholder="Введите ник...">
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" id="authPassword" placeholder="Введите пароль...">
+            </div>
+            <button class="submit-btn" onclick="performAuth()">Войти</button>
+            <p style="text-align:center; margin-top:12px; font-size:13px; color:var(--text-muted);">
+                Для входа под Разработчиком используйте логин <b>volkTeam</b>
+            </p>
+        </div>
+    </div>
+
+    <!-- Окно Модерации -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content large">
+            <span class="close-modal" onclick="closeAdminModal()">&times;</span>
+            <h2><i class="fa-solid fa-user-shield"></i> Панель Модерации</h2>
+            
+            <div id="devOnlySection" style="display:none;" class="admin-block">
+                <h3><i class="fa-solid fa-code"></i> Функция Разработчика: Назначение Модератора</h3>
+                <div class="form-group-inline">
+                    <input type="text" id="targetModUsername" placeholder="Никнейм пользователя...">
+                    <button class="action-btn primary" onclick="devAssignModerator()">Назначить MODER</button>
+                    <button class="action-btn danger" onclick="devRemoveModerator()">Снять MODER</button>
+                </div>
+            </div>
+
+            <div class="admin-block">
+                <h3><i class="fa-solid fa-ban"></i> Забанить пользователя навсегда</h3>
+                <div class="form-group-inline">
+                    <input type="text" id="targetBanUsername" placeholder="Никнейм для бана...">
+                    <button class="action-btn danger" onclick="adminBanUser()">Забанить</button>
+                </div>
+            </div>
+
+            <div class="admin-block">
+                <h3><i class="fa-solid fa-flag"></i> Жалобы на спам (ЖБ)</h3>
+                <div id="reportsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Футер -->
+    <footer class="footer">
+        <p>Сообщество Volk Team</p>
+        <div class="social-links">
+            <a href="https://www.youtube.com/@Volk_TeamSCRIPT" target="_blank" class="social-btn youtube">
+                <i class="fa-brands fa-youtube"></i> YouTube
+            </a>
+            <a href="https://t.me/volk_play_and_bg" target="_blank" class="social-btn telegram">
+                <i class="fa-brands fa-telegram"></i> Telegram
+            </a>
+            <a href="https://t.me/volk_smart_bot" target="_blank" class="social-btn bot">
+                <i class="fa-solid fa-robot"></i> Telegram Bot
+            </a>
+        </div>
+        <p class="copyright">© 2026 Volk Hub. Все права защищены.</p>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwAagF0sojPXIqFnrjIgK6npNCW4-6q6g",
+            authDomain: "volkhub-a5aa6.firebaseapp.com",
+            projectId: "volkhub-a5aa6",
+            storageBucket: "volkhub-a5aa6.firebasestorage.app",
+            messagingSenderId: "689855552662",
+            appId: "1:689855552662:web:78637365a82fe19f82f6b7",
+            measurementId: "G-GQF2FQ0CT3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        try {
+            getAnalytics(app);
+        } catch (e) {
+            console.log("Firebase Analytics initialized.");
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

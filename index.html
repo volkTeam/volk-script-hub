@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volk Hub - Roblox Script Repository</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Навигация -->
+    <header class="navbar">
+        <div class="nav-left">
+            <button id="menuBtn" class="icon-btn"><i class="fa-solid fa-bars"></i></button>
+            <a href="#" class="logo" onclick="switchTab('home')">
+                <i class="fa-solid fa-cube"></i> Volk<span>Hub</span>
+            </a>
+        </div>
+        <div class="nav-right">
+            <button class="theme-btn"><i class="fa-solid fa-moon"></i></button>
+            <button class="auth-btn login" onclick="alert('Авторизация в разработке')">Login</button>
+            <button class="auth-btn signup" onclick="alert('Регистрация в разработке')">Sign Up</button>
+        </div>
+    </header>
+
+    <!-- Выдвижное меню (Sidebar) -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3>Menu</h3>
+            <button id="closeMenuBtn" class="icon-btn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <ul class="sidebar-links">
+            <li><a href="#" onclick="switchTab('home'); closeMenu();"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li><a href="#" onclick="switchTab('upload'); closeMenu();"><i class="fa-solid fa-cloud-arrow-up"></i> Upload</a></li>
+            <li><a href="#" onclick="switchTab('trending'); closeMenu();"><i class="fa-solid fa-fire"></i> Trending</a></li>
+            <li><a href="#" onclick="switchTab('guides'); closeMenu();"><i class="fa-solid fa-graduation-cap"></i> Guides</a></li>
+            <li><a href="#" onclick="switchTab('rules'); closeMenu();"><i class="fa-solid fa-shield-halved"></i> Rules</a></li>
+        </ul>
+    </div>
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Основной контент -->
+    <main class="container">
+
+        <!-- Вкладка HOME -->
+        <section id="home-tab" class="tab-content active">
+            <div class="stats-bar">
+                <span class="online-dot reg"></span> <span id="regCount">244</span> Registered users online
+                <span class="online-dot guest"></span> <span id="guestCount">7857</span> Guests online
+            </div>
+
+            <div class="hero">
+                <h1 class="gradient-text">Volk Hub</h1>
+                <p>Search the best Lua scripts available in the community uploaded by users!</p>
+                
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Try 'adopt me' or 'blox fruits'...">
+                    <button class="filter-btn"><i class="fa-solid fa-sliders"></i></button>
+                    <button class="search-submit" onclick="searchScripts()">Search</button>
+                </div>
+                
+                <div class="strict-toggle">
+                    <input type="checkbox" id="strictSearch">
+                    <label for="strictSearch">Strict search (match exact input)</label>
+                </div>
+            </div>
+
+            <!-- Инфо-блоки -->
+            <div class="info-cards">
+                <div class="info-card">
+                    <i class="fa-solid fa-users"></i>
+                    <h3>Active community</h3>
+                    <p>Join millions of people already sharing their content!</p>
+                </div>
+                <div class="info-card">
+                    <i class="fa-solid fa-book-open"></i>
+                    <h3>Extensive collection</h3>
+                    <p>With hundreds of scripts uploaded every day, variety is almost endless!</p>
+                </div>
+                <div class="info-card">
+                    <i class="fa-solid fa-rocket"></i>
+                    <h3>Bring your spin</h3>
+                    <p>Have something to share? Join, upload, and make your presence known!</p>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <h2><i class="fa-solid fa-code"></i> Recent Scripts</h2>
+            </div>
+            
+            <div id="scriptsContainer" class="scripts-grid">
+                <!-- Скрипты будут добавляться сюда динамически -->
+            </div>
+        </section>
+
+        <!-- Вкладка UPLOAD -->
+        <section id="upload-tab" class="tab-content">
+            <div class="form-container">
+                <h2>Upload Script</h2>
+                <form id="uploadForm" onsubmit="handleUpload(event)">
+                    <div class="form-group">
+                        <label>Script Title</label>
+                        <input type="text" id="scriptTitle" required placeholder="e.g. Blox Fruits Auto Farm">
+                    </div>
+                    <div class="form-group">
+                        <label>Game Name</label>
+                        <input type="text" id="scriptGame" required placeholder="e.g. Blox Fruits">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="scriptDesc" rows="3" placeholder="Describe your script..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Lua Code</label>
+                        <textarea id="scriptCode" rows="6" required placeholder="print('Hello Volk Hub!')"></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Publish Script</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Вкладка TRENDING -->
+        <section id="trending-tab" class="tab-content">
+            <h2>Trending Scripts</h2>
+            <p>Most popular and viewed scripts this week.</p>
+            <div id="trendingContainer" class="scripts-grid"></div>
+        </section>
+
+        <!-- Вкладка GUIDES -->
+        <section id="guides-tab" class="tab-content">
+            <div class="doc-header">
+                <h2>Guides</h2>
+                <p>Four short reads, in order. Start with number 1.</p>
+            </div>
+            <div class="doc-card">
+                <h3><span>1</span> What is a Roblox script?</h3>
+                <p>A plain-English explanation of what scripts are, what they do, and what the labels mean.</p>
+            </div>
+            <div class="doc-card">
+                <h3><span>2</span> What is a script executor?</h3>
+                <p>Executors are programs that run scripts. Learn the difference between free and paid ones.</p>
+            </div>
+            <div class="doc-card">
+                <h3><span>3</span> How to run your first script</h3>
+                <p>The whole process from nothing to a working script, plus troubleshooting steps.</p>
+            </div>
+            <div class="doc-card">
+                <h3><span>4</span> Staying safe</h3>
+                <p>How to spot fake downloads, avoid key systems scams, and protect your account.</p>
+            </div>
+        </section>
+
+        <!-- Вкладка RULES -->
+        <section id="rules-tab" class="tab-content">
+            <div class="doc-header">
+                <h2>Rules & License</h2>
+                <p>Please follow these community guidelines to keep Volk Hub clean.</p>
+            </div>
+            <div class="rule-box">
+                <h3>License & Spam Control</h3>
+                <p>Posting fake, duplicate, or broken scripts specifically to flood the website is strictly prohibited.</p>
+                <ul>
+                    <li><strong>A.</strong> Intentionally posting scripts just to advertise a game or discord server.</li>
+                    <li><strong>B.</strong> Posting malicious code designed to crash games or steal accounts.</li>
+                    <li><strong>C.</strong> Flooding comment sections with empty spam or botted accounts.</li>
+                </ul>
+            </div>
+            <div class="rule-box">
+                <h3>Perverted Exploiting</h3>
+                <p>Posting any NSFW content, suggestive images, or inappropriate script names/descriptions will result in an immediate ban.</p>
+            </div>
+        </section>
+
+        <!-- Страница детального просмотра скрипта -->
+        <section id="detail-tab" class="tab-content">
+            <button class="back-btn" onclick="switchTab('home')"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <div id="scriptDetailContent"></div>
+        </section>
+
+    </main>
+
+    <!-- Футер с соцсетями -->
+    <footer class="footer">
+        <p>Connect with Volk Team</p>
+        <div class="social-links">
+            <a href="https://www.youtube.com/@Volk_TeamSCRIPT" target="_blank" class="social-btn youtube">
+                <i class="fa-brands fa-youtube"></i> YouTube
+            </a>
+            <a href="https://t.me/volk_play_and_bg" target="_blank" class="social-btn telegram">
+                <i class="fa-brands fa-telegram"></i> Telegram
+            </a>
+            <a href="https://t.me/volk_smart_bot" target="_blank" class="social-btn bot">
+                <i class="fa-solid fa-robot"></i> Telegram Bot
+            </a>
+        </div>
+        <p class="copyright">© 2026 Volk Hub. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

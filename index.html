@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volk Hub - Roblox Script Repository</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Security Preloader & Verification -->
+    <div id="botVerifyOverlay" class="verify-overlay">
+        <div class="verify-card">
+            <div class="verify-logo">
+                <i class="fa-solid fa-cube"></i> Volk<span>Hub</span>
+            </div>
+            <h2>Security Verification</h2>
+            <p>Please complete this quick bot check to access Volk Hub safely.</p>
+            <button class="verify-btn" onclick="passBotVerify()">
+                <i class="fa-solid fa-robot"></i> I am human / Verify
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-left">
+            <a href="#" class="logo" onclick="switchTab('home')">
+                <i class="fa-solid fa-cube"></i> Volk<span>Hub</span>
+            </a>
+        </div>
+        <div class="nav-right">
+            <button id="adminPanelBtn" class="icon-btn admin-only-btn" style="display:none;" onclick="openAdminModal()" title="Moderation Panel">
+                <i class="fa-solid fa-shield-halved"></i>
+            </button>
+
+            <div id="userBadge" class="user-status-tag">Guest</div>
+
+            <button class="auth-btn login" id="authActionBtn" onclick="openAuthModal()">Sign In</button>
+            
+            <button id="menuBtn" class="icon-btn menu-bolt-btn" title="Menu">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Sidebar Menu -->
+    <div id="sidebar" class="sidebar sidebar-right">
+        <div class="sidebar-header">
+            <h3><i class="fa-solid fa-sliders"></i> Navigation</h3>
+            <button id="closeMenuBtn" class="icon-btn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <ul class="sidebar-links">
+            <li><a href="#" onclick="switchTab('profile'); closeMenu();"><i class="fa-solid fa-user"></i> Profile</a></li>
+            <li><a href="#" onclick="switchTab('home'); closeMenu();"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li><a href="#" onclick="switchTab('upload'); closeMenu();"><i class="fa-solid fa-cloud-arrow-up"></i> Publish Script</a></li>
+            <li><a href="#" onclick="switchTab('trending'); closeMenu();"><i class="fa-solid fa-fire"></i> Trending</a></li>
+            <li><a href="#" onclick="switchTab('info'); closeMenu();"><i class="fa-solid fa-circle-info"></i> Volk Info</a></li>
+            <li><a href="#" onclick="switchTab('support'); closeMenu();"><i class="fa-solid fa-headset"></i> Volk Support</a></li>
+            <li><a href="#" onclick="switchTab('guides'); closeMenu();"><i class="fa-solid fa-graduation-cap"></i> Guides</a></li>
+            <li><a href="#" onclick="switchTab('rules'); closeMenu();"><i class="fa-solid fa-shield-halved"></i> Rules</a></li>
+        </ul>
+    </div>
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Main Content -->
+    <main class="container">
+
+        <!-- PROFILE TAB -->
+        <section id="profile-tab" class="tab-content">
+            <div class="form-container">
+                <h2><i class="fa-solid fa-id-card"></i> User Profile</h2>
+                
+                <div id="profileGuestNotice" class="notice-box" style="display:none;">
+                    Please sign in to view and edit your profile!
+                </div>
+
+                <div id="profileContent" style="display:none;">
+                    <!-- 1. Username -->
+                    <div style="margin-bottom: 20px;">
+                        <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">USERNAME</label>
+                        <h3 id="profileUsernameDisplay" style="font-size: 22px; color: var(--accent);">Guest</h3>
+                    </div>
+
+                    <!-- 2. Profile Bio -->
+                    <div class="form-group">
+                        <label style="font-size:12px; color:var(--text-muted);">PROFILE DESCRIPTION (BIO)</label>
+                        <textarea id="profileBioInput" rows="3" placeholder="Tell the community about yourself or your scripts..."></textarea>
+                        <button class="action-btn primary" style="margin-top:8px;" onclick="saveProfileBio()">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Bio
+                        </button>
+                    </div>
+
+                    <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 25px 0;">
+
+                    <!-- 3. My Published Scripts -->
+                    <div>
+                        <h3><i class="fa-solid fa-code"></i> My Scripts</h3>
+                        <div id="myScriptsContainer" class="scripts-grid" style="margin-top: 15px;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOME TAB -->
+        <section id="home-tab" class="tab-content active">
+            <div class="hero">
+                <h1 class="gradient-text">Volk Hub</h1>
+                <p>The ultimate Lua script catalog for Roblox powered by Volk Team community!</p>
+                
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Search scripts or games...">
+                    <button class="search-submit" onclick="searchScripts()">Search</button>
+                </div>
+            </div>
+
+            <div class="info-cards">
+                <div class="info-card">
+                    <i class="fa-solid fa-users"></i>
+                    <h3>Active Community</h3>
+                    <p>Share scripts and discover top-rated Roblox exploits for free!</p>
+                </div>
+                <div class="info-card">
+                    <i class="fa-solid fa-shield-cat"></i>
+                    <h3>Built-in Protection</h3>
+                    <p>Automated and manual security checks filter out threats and malware.</p>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <h2><i class="fa-solid fa-code"></i> Latest Scripts</h2>
+            </div>
+            
+            <div id="scriptsContainer" class="scripts-grid"></div>
+        </section>
+
+        <!-- UPLOAD TAB -->
+        <section id="upload-tab" class="tab-content">
+            <div class="form-container">
+                <h2>Publish Script</h2>
+                <div id="uploadRestrictionNotice" class="notice-box" style="display:none;"></div>
+                <form id="uploadForm" onsubmit="handleUpload(event)">
+                    <div class="form-group">
+                        <label>Script Title</label>
+                        <input type="text" id="scriptTitle" required placeholder="e.g. Blox Fruits Auto Farm">
+                    </div>
+                    <div class="form-group">
+                        <label>Game Name</label>
+                        <input type="text" id="scriptGame" required placeholder="e.g. Blox Fruits">
+                    </div>
+                    
+                    <!-- KEY CHECKBOX OPTION -->
+                    <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin: 10px 0;">
+                        <input type="checkbox" id="scriptRequiresKey" style="width: 20px; height: 20px; cursor: pointer;">
+                        <label for="scriptRequiresKey" style="cursor: pointer; font-weight: bold; margin: 0;">
+                            <i class="fa-solid fa-key" style="color: var(--accent);"></i> Key System / Requires Key
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="scriptDesc" rows="3" placeholder="Describe script features..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Lua Code</label>
+                        <textarea id="scriptCode" rows="6" required placeholder="loadstring(game:HttpGet(...))()"></textarea>
+                    </div>
+                    <button type="submit" id="submitScriptBtn" class="submit-btn">Publish Script</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- TRENDING TAB -->
+        <section id="trending-tab" class="tab-content">
+            <h2>Trending Scripts</h2>
+            <p>Most popular and highest-rated scripts from our community.</p>
+            <div id="trendingContainer" class="scripts-grid"></div>
+        </section>
+
+        <!-- VOLK INFO TAB -->
+        <section id="info-tab" class="tab-content">
+            <div class="doc-header">
+                <h2><i class="fa-solid fa-circle-info"></i> About Volk Hub</h2>
+            </div>
+            <div class="doc-card">
+                <h3><i class="fa-solid fa-rocket"></i> What is Volk Hub?</h3>
+                <p>Volk Hub is an open community platform where creators and players can upload, share, and review Lua scripts for Roblox games effortlessly.</p>
+            </div>
+            <div class="doc-card">
+                <h3><i class="fa-solid fa-bug-slash"></i> Antivirus & Anti-Trojan Shield</h3>
+                <p>We take safety seriously! Every script submitted is monitored by automated scanners and moderation leads. Scripts flagged with malicious payload are instantly quarantined with DETECTED TROJAN status.</p>
+            </div>
+            <div class="doc-card">
+                <h3><i class="fa-solid fa-star"></i> Verified Badges</h3>
+                <p>Trusted content developers receive a verified mark <b>✔️</b> confirming that their scripts are safe and regularly updated.</p>
+            </div>
+        </section>
+
+        <!-- VOLK SUPPORT TAB -->
+        <section id="support-tab" class="tab-content">
+            <div class="form-container">
+                <h2><i class="fa-solid fa-headset"></i> Volk Support & Bug Report</h2>
+                <p style="color:var(--text-muted); font-size:13px; margin-bottom:15px;">
+                    Found a bug or have a feature request? Send a report directly to the Volk Team moderation desk!
+                </p>
+                <form id="supportForm" onsubmit="handleSupportSubmit(event)">
+                    <div class="form-group">
+                        <label>Subject / Issue Title</label>
+                        <input type="text" id="supportSubject" required placeholder="e.g. Bug with copy button on mobile">
+                    </div>
+                    <div class="form-group">
+                        <label>Detailed Description</label>
+                        <textarea id="supportMessage" rows="5" required placeholder="Explain the problem or request step-by-step..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Submit Ticket</button>
+                </form>
+
+                <div style="margin-top:25px;">
+                    <h3><i class="fa-solid fa-list-check"></i> Recent Support Reports</h3>
+                    <div id="userSupportTickets" style="margin-top:10px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GUIDES TAB -->
+        <section id="guides-tab" class="tab-content">
+            <div class="doc-header">
+                <h2>Guides & Instructions</h2>
+            </div>
+            <div class="doc-card">
+                <h3><span>1</span> What is an Executor / Exploit?</h3>
+                <p>Software designed to execute Lua scripts inside the Roblox game client (e.g., Delta, Fluxus, Codex, Cryptic).</p>
+            </div>
+            <div class="doc-card">
+                <h3><span>2</span> How to execute a script?</h3>
+                <p>Click "Copy Script", open your executor in-game, paste the code into the text area, and click Execute.</p>
+            </div>
+        </section>
+
+        <!-- RULES TAB -->
+        <section id="rules-tab" class="tab-content">
+            <div class="doc-header">
+                <h2>Terms & Rules</h2>
+            </div>
+            <div class="rule-box">
+                <h3>Service Rules & Bans:</h3>
+                <ul>
+                    <li>Spamming, posting fake links, or uploading disguised malware is strictly forbidden.</li>
+                    <li>Advertising unauthorized external harmful services will lead to an immediate ban.</li>
+                    <li>Moderators (MODER) and Developers (DEVELOPER) hold full rights to permanently ban abusive accounts.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Script Detail Tab -->
+        <section id="detail-tab" class="tab-content">
+            <button class="back-btn" onclick="switchTab('home')"><i class="fa-solid fa-arrow-left"></i> Back</button>
+            <div id="scriptDetailContent"></div>
+        </section>
+
+    </main>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeAuthModal()">&times;</span>
+            <h2 id="modalTitle">Account Sign In</h2>
+            <div class="form-group">
+                <label>Username (Max 10 chars)</label>
+                <input type="text" id="authUsername" maxlength="10" placeholder="Enter username...">
+            </div>
+            <div class="form-group">
+                <label>Password (Max 15 chars)</label>
+                <input type="password" id="authPassword" maxlength="15" placeholder="Enter password...">
+            </div>
+            <button class="submit-btn" onclick="performAuth()">Sign In</button>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content large">
+            <span class="close-modal" onclick="closeAdminModal()">&times;</span>
+            <h2><i class="fa-solid fa-user-shield"></i> Moderation Panel</h2>
+            
+            <div id="devOnlySection" style="display:none;" class="admin-block">
+                <h3><i class="fa-solid fa-code"></i> Developer Function: Assign Moderator</h3>
+                <div class="form-group-inline">
+                    <input type="text" id="targetModUsername" placeholder="Username...">
+                    <button class="action-btn primary" onclick="devAssignModerator()">Grant MODER</button>
+                    <button class="action-btn danger" onclick="devRemoveModerator()">Revoke MODER</button>
+                </div>
+            </div>
+
+            <div class="admin-block">
+                <h3><i class="fa-solid fa-ban"></i> Ban / Unban Management</h3>
+                <div class="form-group-inline" style="margin-bottom:8px;">
+                    <input type="text" id="targetBanUsername" placeholder="Username to ban...">
+                    <button class="action-btn danger" onclick="adminBanUser()">Ban Permanently</button>
+                </div>
+                <div class="form-group-inline">
+                    <input type="text" id="targetUnbanUsername" placeholder="Username to unban...">
+                    <button class="action-btn primary" onclick="adminUnbanUser()">Unban User</button>
+                </div>
+            </div>
+
+            <div class="admin-block">
+                <h3><i class="fa-solid fa-flag"></i> Spam Reports & Flags</h3>
+                <div id="reportsContainer"></div>
+            </div>
+
+            <div class="admin-block">
+                <h3><i class="fa-solid fa-headset"></i> Volk Support Tickets</h3>
+                <div id="adminTicketsContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Volk Team Community</p>
+        <div class="social-links">
+            <a href="https://www.youtube.com/@Volk_TeamSCRIPT" target="_blank" class="social-btn youtube">
+                <i class="fa-brands fa-youtube"></i> YouTube
+            </a>
+            <a href="https://t.me/volk_play_and_bg" target="_blank" class="social-btn telegram">
+                <i class="fa-brands fa-telegram"></i> Telegram
+            </a>
+            <a href="https://t.me/volk_smart_bot" target="_blank" class="social-btn bot">
+                <i class="fa-solid fa-robot"></i> Telegram Bot
+            </a>
+        </div>
+        <p class="copyright">© 2026 Volk Hub. All rights reserved.</p>
+    </footer>
+
+    <!-- Main Application Module -->
+    <script type="module" src="script.js"></script>
+</body>
+</html>
